@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="./style.css" />
+    <title>WebSocketChat</title>
+  </head>
+  <body>
+    <div class="container">
+      <div id="chat"></div>
+      <form id="message-form">
+        <input
+          type="text"
+          id="message-input"
+          placeholder="Введите сообщение..."
+        />
+        <button type="submit" id="send-message">Send</button>
+      </form>
+    </div>
+    <script type="module">
+      const container = document.querySelector(".container");
+      const chat = document.querySelector("#chat");
+      const messageForm = document.querySelector("#message-form");
+      const sendMessage = document.querySelector("#send-message");
+      const inputMessage = document.querySelector("#message-input");
+
+      const socket = new WebSocket("ws://localhost:8080");
+
+      socket.addEventListener("message", ({ data }) => {
+        const { type, message } = JSON.parse(data);
+        console.log(type, message);
+        const messageText = document.createElement("p");
+        messageText.textContent = message;
+        chat.appendChild(messageText);
+
+        chat.scrollTop = chat.scrollHeight;
+      });
+
+      messageForm.addEventListener("submit", (e) => {
+        e.preventDefault();
+        const message = inputMessage.value;
+        socket.send(message);
+        console.log(message);
+        inputMessage.value = "";
+      });
+    </script>
+  </body>
+</html>
